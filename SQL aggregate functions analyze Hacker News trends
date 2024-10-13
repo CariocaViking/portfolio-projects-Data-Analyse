@@ -1,0 +1,81 @@
+#Start by getting a feel for the hacker_news table
+
+SELECT title, score
+FROM hacker_news
+ORDER BY score DESC
+LIMIT 5;
+
+# Find out if a small percentage of Hacker News users takes the majority of the points
+
+SELECT SUM(score)
+FROM hacker_news;
+
+# Find the individual users that have combined scores of more than 200, and their combined scores
+
+SELECT SUM(score), user
+FROM hacker_news
+GROUP BY user
+HAVING SUM(score) > 200;
+
+# Add their scores together and divide it by the total sum of points 
+
+SELECT (309 + 304 + 282 + 517) / 6366.0;
+
+# Check how many times each offending user posted the given Youtube link
+
+SELECT user, url, COUNT(url)
+FROM hacker_news
+WHERE url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+GROUP BY user
+ORDER BY 3 DESC;
+
+# Check which sites lead the most traffic to Hacker News
+
+SELECT CASE
+   WHEN url LIKE '%github.com%' THEN 'GitHub'
+   WHEN url LIKE '%medium.com%' THEN 'Medium'
+   WHEN url LIKE '%nytimes.com%' THEN 'New York Times'
+   ELSE 'Other'
+  END AS 'Source'
+FROM hacker_news;
+
+# Add a column for the number of stories from each URL 
+
+SELECT CASE
+   WHEN url LIKE '%github.com%' THEN 'GitHub'
+   WHEN url LIKE '%medium.com%' THEN 'Medium'
+   WHEN url LIKE '%nytimes.com%' THEN 'New York Times'
+   ELSE 'Other'
+  END AS 'Source',
+  COUNT(*)
+FROM hacker_news
+GROUP BY 1;
+ 
+# What is the best time of the day to post a story on Hacker News? 
+
+SELECT timestamp,
+   strftime('%H', timestamp)
+FROM hacker_news
+GROUP BY 1
+LIMIT 20;
+
+# Write a query that returns the hours of the timestamp, the average score per hour and the count of stories for each hour
+
+SELECT 
+    strftime('%H', timestamp), 
+    AVG(score),
+    COUNT(*)
+FROM hacker_news
+GROUP BY 1
+ORDER BY 2 DESC;
+
+# Edit the query so you round the average scores, rename the columns and filter out the NULL values in timestamp
+
+SELECT
+  strftime('%H', timestamp) AS 'Hour',
+  ROUND(AVG(score), 1) AS 'Average Score',
+  COUNT(*) AS 'Number of Stories'
+FROM hacker_news
+WHERE timestamp IS NOT NULL
+GROUP BY 1
+ORDER BY 2 DESC;
